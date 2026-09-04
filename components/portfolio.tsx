@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CareerChat } from "./career-chat";
 
 const journey = [
   {
@@ -262,6 +263,7 @@ export function Portfolio() {
         <p>© 2026 Christine Geng</p>
         <a href="#top">Back to top <ArrowUpRight size={14} /></a>
       </footer>
+      <CareerChat />
     </main>
   );
 }

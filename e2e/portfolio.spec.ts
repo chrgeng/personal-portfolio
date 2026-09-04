@@ -36,8 +36,27 @@ test("mobile navigation opens and reaches the work section", async ({ page }, te
   await expect(page.getByRole("heading", { name: /Proof, not promises/ })).toBeInViewport();
 });
 
-test("captures the final visual reference", async ({ page }, testInfo) => {
+test("opens the digital twin and completes a career conversation", async ({ page }) => {
+  await page.route("**/api/chat", async (route) => {
+    const payload = route.request().postDataJSON() as { messages: Array<{ content: string }> };
+    expect(payload.messages.at(-1)?.content).toBe("What kind of AI work has Christine done?");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ reply: "I’ve built applied AI systems across healthcare, research, and enterprise environments." }),
+    });
+  });
+
   await page.goto("/");
-  await page.screenshot({ path: testInfo.outputPath("portfolio-full.png"), fullPage: true });
-  await page.screenshot({ path: testInfo.outputPath("portfolio-fold.png") });
+  await page.getByRole("button", { name: "Chat with Christine's digital twin" }).click();
+  await expect(page.getByRole("dialog", { name: "Career chat" })).toBeVisible();
+  await page.getByRole("button", { name: "What kind of AI work has Christine done?" }).click();
+  await expect(page.getByText("I’ve built applied AI systems across healthcare, research, and enterprise environments.")).toBeVisible();
+  await page.getByRole("button", { name: "Close career chat" }).click();
+  await expect(page.getByRole("dialog", { name: "Career chat" })).not.toBeVisible();
+});
+
+test("rejects an empty chat request", async ({ page }) => {
+  const response = await page.request.post("/api/chat", { data: { messages: [] } });
+  expect(response.status()).toBe(400);
 });
