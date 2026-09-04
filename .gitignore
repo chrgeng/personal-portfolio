@@ -1,0 +1,11 @@
+node_modules/
+.next/
+playwright-report/
+test-results/
+tmp/
+*.tsbuildinfo
+*.log
+.env*
+!.env.example
+/Christine_Geng_resume.pdf
+/linkedin.pdf
